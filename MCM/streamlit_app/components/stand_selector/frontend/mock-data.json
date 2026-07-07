@@ -1,0 +1,35 @@
+{
+  "imagen": "plano_feria.png",
+  "filas": 15,
+  "columnas": 20,
+  "tamanoCeldaPx": 34,
+  "stands": [
+    {
+      "id": "stand-001",
+      "filaInicio": 0,
+      "columnaInicio": 0,
+      "filaFin": 2,
+      "columnaFin": 2,
+      "precioM2": 150,
+      "estado": "disponible"
+    },
+    {
+      "id": "stand-002",
+      "filaInicio": 0,
+      "columnaInicio": 4,
+      "filaFin": 2,
+      "columnaFin": 7,
+      "precioM2": 180,
+      "estado": "disponible"
+    },
+    {
+      "id": "stand-003",
+      "filaInicio": 5,
+      "columnaInicio": 3,
+      "filaFin": 8,
+      "columnaFin": 6,
+      "precioM2": 200,
+      "estado": "disponible"
+    }
+  ]
+}

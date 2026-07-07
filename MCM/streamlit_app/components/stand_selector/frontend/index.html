@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="es">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Selector de stands</title>
+	<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+	<main class="app">
+		<header class="cabecera">
+			<div>
+				<p class="etiqueta">Selector interactivo de stands</p>
+				<h1>Plano de feria EXPO con selección rectangular</h1>
+			</div>
+			<p class="descripcion">
+				Selecciona un espacio disponible y personalizalo a tu gusto.
+			</p>
+		</header>
+
+		<!-- Layout: selector left, reference image right -->
+		<div class="layout-selector">
+			<section class="zona-plano col-seleccion">
+				<div id="contenedor-plano" class="contenedor-plano">
+					<p id="estado-vacio" class="estado-vacio">No hay diseño de feria cargado todavía</p>
+					<div id="grid-celdas" class="grid-celdas" aria-label="Cuadrícula de stands"></div>
+				</div>
+				<p class="ayuda-pan">💡 <kbd>Espacio</kbd> + arrastrar o click medio para mover el plano</p>
+			</section>
+
+			<aside class="col-referencia" id="col-referencia" aria-hidden="true">
+				<img id="imagen-referencia" alt="Plano de referencia" />
+			</aside>
+		</div>
+
+		<section class="panel-estado" aria-live="polite">
+			<article>
+				<span>M² seleccionados</span>
+				<strong id="resumen-area">0</strong>
+			</article>
+			<article>
+				<span>Precio total</span>
+				<strong id="resumen-precio">$0</strong>
+			</article>
+			<article>
+				<span>Coordenadas</span>
+				<strong id="resumen-coordenadas">Sin selección</strong>
+			</article>
+			<article>
+				<span>Estado</span>
+				<strong id="resumen-mensaje">Esperando selección</strong>
+			</article>
+		</section>
+
+		<div id="contenedor-confirmar" style="display:none; text-align:center; margin-top:12px;">
+			<button id="btn-confirmar" class="boton boton--primario" type="button">
+				Confirmar selección
+			</button>
+		</div>
+
+
+
+		<footer class="ayuda">
+			<span class="muestra muestra--disponible"></span> Disponible
+			<span class="muestra muestra--ocupado"></span> Ocupado
+			<span class="muestra muestra--reservado"></span> Reservado
+			<span class="muestra muestra--seleccionado"></span> Seleccionado
+		</footer>
+	</main>
+
+	<script src="./shared.js"></script>
+	<script src="./selector.js"></script>
+
+	<!-- Modal overlay for image preview -->
+	<div id="modal-imagen" class="modal-imagen" hidden>
+		<div class="modal-contenido">
+			<button id="btn-cerrar-modal-imagen" class="modal-cerrar-btn" aria-label="Cerrar">✕</button>
+			<div id="indicador-zoom" class="indicador-zoom">1×</div>
+			<img id="modal-imagen-src" alt="Plano completo">
+		</div>
+	</div>
+
+	<div id="modal-reserva" class="modal-reserva" hidden>
+		<div class="modal-reserva-contenido">
+			<!-- JS lo rellena dinámicamente -->
+		</div>
+	</div>
+</body>
+</html>
