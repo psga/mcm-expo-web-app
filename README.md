@@ -9,7 +9,7 @@ instala streamlit
   
 dentro de `/MCM`
 
- `(.venv) [pablo@pablo mcm-expo-web-app]$ streamlit run Inicio.py`
+```streamlit run Inicio.py```
 
 
 
