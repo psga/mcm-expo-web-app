@@ -1,0 +1,17 @@
+{
+  "Stand A-12 (3x3m)": {
+    "precio": 1500000,
+    "estado": "Disponible",
+    "marca_reservada": ""
+  },
+  "Stand A-15 (3x3m)": {
+    "precio": 2500000,
+    "estado": "Disponible",
+    "marca_reservada": ""
+  },
+  "Stand B-01 (4x4m)": {
+    "precio": 3800000,
+    "estado": "Disponible",
+    "marca_reservada": ""
+  }
+}
