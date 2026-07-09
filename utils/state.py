@@ -3,7 +3,7 @@
 import streamlit as st
 
 from utils.constants import RUTAS_PASOS
-from utils.json_data import leer_pagos_json
+from utils.json_data import leer_expo_json
 
 
 def inicializar_session_state() -> None:
@@ -20,11 +20,14 @@ def inicializar_session_state() -> None:
             "patrocinadora": "Seleccione",
         }
 
-    if "pagos_data" not in st.session_state:
-        st.session_state.pagos_data = leer_pagos_json()
+    if "expo_data" not in st.session_state:
+        st.session_state.expo_data = leer_expo_json()
 
     if "stand_seleccionado" not in st.session_state:
         st.session_state.stand_seleccionado = None
+
+    if "plan_pagos" not in st.session_state:
+        st.session_state.plan_pagos = []
 
     if "cuotas_seleccionadas" not in st.session_state:
         st.session_state.cuotas_seleccionadas = []
@@ -51,10 +54,15 @@ def reiniciar_wizard() -> None:
     claves = [
         "step",
         "marca",
-        "pagos_data",
+        "expo_data",
         "stand_seleccionado",
+        "plan_pagos",
         "cuotas_seleccionadas",
         "seleccion_confirmada",
+        "stand_preview_id",
+        "cuotas_sel",
+        "stand_etiqueta_sel",
+        "filtro_zona_stand",
         "firma_intentos",
         "firma_valida",
         "ultimo_archivo",
@@ -78,9 +86,9 @@ def ir_a_paso(paso: int) -> None:
 
 
 def obtener_pagos_filtrados() -> list:
-    """Devuelve las cuotas seleccionadas o todas si no hay filtro."""
-    pagos = st.session_state.pagos_data["pagos"]
+    """Devuelve las cuotas seleccionadas del plan en sesión."""
+    pagos = st.session_state.plan_pagos
     seleccion = st.session_state.cuotas_seleccionadas
     if not seleccion:
         return pagos
-    return [p for p in pagos if p["concepto"] in seleccion]
+    return [pago for pago in pagos if pago["concepto"] in seleccion]

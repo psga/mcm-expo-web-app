@@ -1,48 +1,112 @@
-"""Lectura y escritura segura del archivo pagos_stand.json."""
+"""Lectura y utilidades sobre datasinimagen.json (solo lectura)."""
 
-import copy
 import json
 
 import streamlit as st
 
-from utils.constants import DEFAULT_PAGOS_DATA, PAGOS_JSON_PATH
+from utils.constants import DATA_JSON_PATH
+from utils.formatters import formatear_moneda
 
 
-def crear_pagos_json_si_no_existe(ruta=PAGOS_JSON_PATH) -> None:
-    """Crea el archivo mock de pagos si aún no existe."""
-    if not ruta.exists():
-        with open(ruta, "w", encoding="utf-8") as archivo:
-            json.dump(DEFAULT_PAGOS_DATA, archivo, ensure_ascii=False, indent=2)
-
-
-def leer_pagos_json(ruta=PAGOS_JSON_PATH) -> dict:
-    """Lee el JSON de pagos; devuelve copia de datos por defecto si falla."""
+def leer_expo_json(ruta=DATA_JSON_PATH) -> dict:
+    """Lee datasinimagen.json de forma segura."""
     try:
-        crear_pagos_json_si_no_existe(ruta)
         with open(ruta, "r", encoding="utf-8") as archivo:
             return json.load(archivo)
     except (json.JSONDecodeError, OSError) as error:
-        st.warning(f"No se pudo leer el archivo de pagos: {error}. Usando datos por defecto.")
-        return copy.deepcopy(DEFAULT_PAGOS_DATA)
+        st.error(f"No se pudo leer datasinimagen.json: {error}")
+        st.stop()
 
 
-def guardar_pagos_json(datos: dict, ruta=PAGOS_JSON_PATH) -> bool:
-    """Persiste los datos de pagos en el archivo JSON."""
-    try:
-        with open(ruta, "w", encoding="utf-8") as archivo:
-            json.dump(datos, archivo, ensure_ascii=False, indent=2)
-        return True
-    except OSError as error:
-        st.error(f"Error al guardar los pagos: {error}")
-        return False
+def mapa_zonas(datos: dict) -> dict:
+    """Indexa las zonas por id."""
+    return {zona["id"]: zona for zona in datos.get("zonas", [])}
+
+
+def calcular_area_m2(stand: dict) -> int:
+    """Calcula el área en m² a partir de la grilla del stand."""
+    filas = stand["filaFin"] - stand["filaInicio"] + 1
+    columnas = stand["columnaFin"] - stand["columnaInicio"] + 1
+    return filas * columnas
+
+
+def enriquecer_stand(stand: dict, zonas: dict) -> dict:
+    """Agrega datos derivados del JSON sin modificar el archivo."""
+    zona = zonas.get(stand["zonaId"], {})
+    area_m2 = calcular_area_m2(stand)
+    valor_total = stand["precioM2"] * area_m2
+    return {
+        **stand,
+        "zona_nombre": zona.get("nombre", stand["zonaId"]),
+        "zona_precio_m2": zona.get("precioM2", stand["precioM2"]),
+        "area_m2": area_m2,
+        "valor_total": valor_total,
+    }
+
+
+def filtrar_stands_para_marca(datos: dict, es_patrocinadora: bool) -> list:
+    """Filtra stands según el tipo de marca registrada."""
+    zonas = mapa_zonas(datos)
+    stands = datos.get("stands", [])
+
+    if es_patrocinadora:
+        candidatos = [s for s in stands if s.get("tipo") == "patrocinador"]
+    else:
+        candidatos = [
+            s for s in stands if s.get("tipo") == "venta" and s.get("estado") == "disponible"
+        ]
+
+    return [enriquecer_stand(stand, zonas) for stand in candidatos]
+
+
+def obtener_zonas_con_stands(stands: list) -> list:
+    """Lista única de zonas presentes en los stands filtrados."""
+    zonas = sorted({stand["zona_nombre"] for stand in stands})
+    return ["Todas"] + zonas
+
+
+def filtrar_por_zona(stands: list, zona: str) -> list:
+    """Filtra stands por nombre de zona."""
+    if zona == "Todas":
+        return stands
+    return [stand for stand in stands if stand["zona_nombre"] == zona]
 
 
 def formatear_stand_opcion(stand: dict) -> str:
-    """Genera la etiqueta visible para el selectbox de stands."""
-    valor = f"${stand['valor_total']:,}".replace(",", ".")
-    return f"Stand {stand['id']} | {stand['pabellon']} | {stand['area']} | {valor}"
+    """Etiqueta legible para el selectbox de stands."""
+    return (
+        f"{stand['id']} | {stand['zona_nombre']} | {stand['area_m2']} m² | "
+        f"{formatear_moneda(stand['precioM2'])}/m² | "
+        f"Total {formatear_moneda(stand['valor_total'])} | {stand['estado']}"
+    )
 
 
-def obtener_stand_desde_json(datos: dict) -> dict:
-    """Obtiene el stand definido en el JSON (estructura actual: un solo stand)."""
-    return datos["stand"]
+def generar_plan_pagos(valor_total: int) -> list:
+    """
+    Genera el plan de cuotas en memoria a partir del valor del stand.
+    El JSON no incluye cuotas; se calculan sin alterar datasinimagen.json.
+    """
+    anticipo = round(valor_total * 0.30)
+    pago_1 = round(valor_total * 0.35)
+    pago_2 = valor_total - anticipo - pago_1
+
+    return [
+        {
+            "concepto": "Anticipo",
+            "valor": anticipo,
+            "estado": "Pendiente",
+            "fecha_limite": "2026-03-15",
+        },
+        {
+            "concepto": "Pago 1",
+            "valor": pago_1,
+            "estado": "Pendiente",
+            "fecha_limite": "2026-04-30",
+        },
+        {
+            "concepto": "Pago 2",
+            "valor": pago_2,
+            "estado": "Pendiente",
+            "fecha_limite": "2026-06-15",
+        },
+    ]

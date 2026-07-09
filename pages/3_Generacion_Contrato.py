@@ -27,7 +27,7 @@ st.info(
 marca = st.session_state.marca
 stand = st.session_state.stand_seleccionado
 pagos = obtener_pagos_filtrados()
-cuotas_texto = ", ".join(p["concepto"] for p in pagos)
+cuotas_texto = ", ".join(pago["concepto"] for pago in pagos)
 valor_total = formatear_moneda(stand["valor_total"])
 
 st.markdown(
@@ -39,7 +39,8 @@ st.markdown(
             <strong>{marca["nombre"]}</strong> con NIT <strong>{marca["nit"]}</strong>,
             correo electrónico <strong>{marca["correo"]}</strong> y teléfono
             <strong>{marca["telefono"]}</strong>, acuerdan la participación en el
-            <strong>Stand {stand["id"]}</strong> ({stand["pabellon"]}, {stand["area"]})
+            <strong>Stand {stand["id"]}</strong> (Zona {stand["zona_nombre"]},
+            {stand["area_m2"]} m², {formatear_moneda(stand["precioM2"])}/m²)
             de la EXPO Maratón Medellín, por un valor total de <strong>{valor_total}</strong>.
         </p>
         <p>

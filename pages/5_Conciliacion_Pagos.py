@@ -4,7 +4,6 @@ import pandas as pd
 import streamlit as st
 
 from utils.formatters import formatear_moneda
-from utils.json_data import guardar_pagos_json
 from utils.setup import configurar_pagina
 from utils.state import ir_a_paso, obtener_pagos_filtrados, reiniciar_wizard
 
@@ -26,12 +25,12 @@ if st.session_state.get("pago_simulado"):
 
 stand = st.session_state.stand_seleccionado
 pagos_filtrados = obtener_pagos_filtrados()
-conceptos_filtrados = {p["concepto"] for p in pagos_filtrados}
+conceptos_filtrados = {pago["concepto"] for pago in pagos_filtrados}
 
 opciones_pendientes = [
-    p["concepto"]
-    for p in st.session_state.pagos_data["pagos"]
-    if p["concepto"] in conceptos_filtrados and p["estado"] == "Pendiente"
+    pago["concepto"]
+    for pago in st.session_state.plan_pagos
+    if pago["concepto"] in conceptos_filtrados and pago["estado"] == "Pendiente"
 ]
 
 valor_formateado = formatear_moneda(stand["valor_total"])
@@ -40,7 +39,7 @@ st.markdown(
     <div class="caja-stand-info">
         <strong>Detalles del Espacio Seleccionado:</strong>
         <span>
-            Stand {stand['id']} | {stand['pabellon']} | {stand['area']}
+            Stand {stand['id']} | {stand['zona_nombre']} | {stand['area_m2']} m²
             | Valor total: {valor_formateado}
         </span>
     </div>
@@ -72,14 +71,13 @@ if st.button("Simular Pago Ahora", type="primary", key="simular_pago"):
         st.info("No hay pagos pendientes por simular en las cuotas seleccionadas.")
     else:
         pago_actualizado = False
-        for pago in st.session_state.pagos_data["pagos"]:
+        for pago in st.session_state.plan_pagos:
             if pago["concepto"] == cuota_a_simular and pago["estado"] == "Pendiente":
                 pago["estado"] = "Bloqueado"
                 pago_actualizado = True
                 break
 
         if pago_actualizado:
-            guardar_pagos_json(st.session_state.pagos_data)
             st.session_state.pago_simulado = True
             st.rerun()
 st.markdown("</div>", unsafe_allow_html=True)

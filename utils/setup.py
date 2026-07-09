@@ -2,7 +2,6 @@
 
 import streamlit as st
 
-from utils.json_data import crear_pagos_json_si_no_existe
 from utils.sidebar import renderizar_sidebar
 from utils.state import inicializar_session_state
 from utils.styles import inyectar_estilos
@@ -18,7 +17,6 @@ def configurar_pagina() -> None:
         )
         st.session_state.page_config_set = True
 
-    crear_pagos_json_si_no_existe()
     inyectar_estilos()
     inicializar_session_state()
     renderizar_sidebar()
