@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="es">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Editor de stands</title>
+	<link rel="stylesheet" href="./style.css">
+	<script src="./streamlit-bridge.js"></script>
+</head>
+<body>
+	<main class="app panel-admin">
+		<header class="cabecera">
+			<div>
+				<p class="etiqueta">Modo administrador</p>
+				<h1>Diseño de stands sobre el plano de feria</h1>
+			</div>
+			<p class="descripcion">
+				Crea una zona para empezara dibujar stands.
+				Define rectángulos de al menos 3x3 celdas, sin solaparlos, y descarga el resultado como JSON para el backend.
+			</p>
+		</header>
+
+		<details class="panel-zonas-detalles" open>
+			<summary>Gestión de zonas</summary>
+			<div class="panel-zonas">
+				<div class="zona-form">
+					<div class="campo">
+						<label for="zona-nombre">Nombre de zona</label>
+						<input id="zona-nombre" type="text" placeholder="ej. Zona A — Entrada">
+					</div>
+					<div class="campo">
+						<label for="zona-color">Color</label>
+						<input id="zona-color" type="color" value="#3b82f6">
+					</div>
+					<div class="campo">
+						<label for="zona-precio">Precio por m²</label>
+						<input id="zona-precio" type="number" min="0" step="1000" value="150000">
+					</div>
+					<div class="campo">
+						<label for="zona-tipo">Tipo</label>
+						<select id="zona-tipo">
+							<option value="venta">Venta normal</option>
+							<option value="patrocinador">Patrocinador</option>
+						</select>
+					</div>
+					<button id="btn-crear-zona" class="boton boton--primario" type="button">
+						Crear zona
+					</button>
+					<p id="zona-error" class="campo-error" aria-live="polite" hidden></p>
+				</div>
+
+				<div id="lista-zonas" class="lista-zonas"></div>
+			</div>
+		</details>
+
+		<section class="barra-herramientas">
+			<div class="campo">
+				<label for="zona-activa">Zona activa</label>
+				<select id="zona-activa">
+					<option value="">— Selecciona una zona —</option>
+				</select>
+				<p id="aviso-zona-activa" class="nota aviso-zona-activa">Selecciona o crea una zona antes de dibujar stands.</p>
+			</div>
+			<div class="campo">
+				<label for="archivo-plano">Cargar plano de fondo</label>
+				<input id="archivo-plano" type="file" accept="image/*">
+			</div>
+			<div class="campo">
+				<label for="filas-grid">Filas (m)</label>
+				<input id="filas-grid" type="number" min="1" step="1" value="20">
+			</div>
+			<div class="campo">
+				<label for="columnas-grid">Columnas (m)</label>
+				<input id="columnas-grid" type="number" min="1" step="1" value="30">
+			</div>
+			<button id="aplicar-dimensiones" class="boton" type="button">Aplicar dimensiones</button>
+			<button id="importar-diseno" class="boton" type="button">Importar diseño</button>
+			<div class="campo">
+				<label for="stand-seleccionado">Stand seleccionado</label>
+				<input id="stand-seleccionado" type="text" value="Ninguno" readonly>
+			</div>
+			<button id="aplicar-precio" class="boton" type="button">Aplicar precio de zona</button>
+			<button id="eliminar-stand" class="boton boton--peligro" type="button" disabled>Eliminar stand seleccionado</button>
+			<button id="guardar-diseno" class="boton boton--primario" type="button">Guardar diseño</button>
+			<p id="indicador-cambios" class="indicador-cambios">Sin cambios sin guardar</p>
+			<input id="archivo-diseno" type="file" accept=".json" hidden>
+			<p class="nota">Solo debes colocar el JSON descargado junto a <strong>index.html</strong>; la imagen del plano ya va embebida dentro del archivo.</p>
+		</section>
+
+		<section class="estado-admin">
+			<article>
+				<span>Zona activa</span>
+				<strong id="resumen-zona-admin">Sin zona</strong>
+			</article>
+			<article>
+				<span>Stand actual</span>
+				<strong id="resumen-stand-admin">Ninguno</strong>
+			</article>
+			<article>
+				<span>Estado</span>
+				<strong id="resumen-estado-admin">Listo para dibujar</strong>
+			</article>
+		</section>
+
+		<section class="zona-plano">
+			<div id="contenedor-plano" class="contenedor-plano">
+				<div id="grid-celdas" class="grid-celdas" aria-label="Cuadrícula de edición"></div>
+			</div>
+			<p class="ayuda-pan">💡 click medio para mover el plano</p>
+		</section>
+	</main>
+
+	<script src="./shared.js" defer></script>
+	<script src="./admin.js" defer></script>
+	<script src="./admin-streamlit-hook.js" defer></script>
+</body>
+</html>

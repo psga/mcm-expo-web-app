@@ -1,0 +1,9 @@
+[client]
+# Streamlit detecta automáticamente cualquier carpeta "pages/" y genera enlaces
+# de navegación en el sidebar para cada .py que contiene (1_Registro_Marca.py
+# ... 6_Mis_Pagos.py, y expondría también pages/admin/ si tuviera .py sueltos
+# en el nivel raíz de pages/). El routing real lo controlan app.py (rol) y
+# utils/state.ir_a_paso (paso del wizard), con su propio sidebar — así que
+# desactivamos la navegación automática acá. El guard de rol al inicio de
+# cada página en pages/ es la protección real contra acceso directo por URL.
+showSidebarNavigation = false
